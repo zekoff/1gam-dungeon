@@ -6,13 +6,16 @@ var WORLD_HEIGHT = 20;
 
 var player;
 var layer;
+var moveTarget;
 
 state.create = function() {
-    player = game.add.sprite(30, 30, 'pix');
-    player.height = 40;
+    player = game.add.sprite(50, 50, 'pix');
+    player.height = 20;
     player.width = 20;
     player.tint = 0x00ff00;
+    player.anchor.set(0.5);
     game.camera.follow(player);
+    game.camera.roundPx = false;
     game.physics.arcade.enable(player);
     var map = game.add.tilemap();
     map.addTilesetImage('test_tileset');
@@ -33,15 +36,26 @@ state.create = function() {
     game.physics.arcade.setBoundsToWorld();
     player.body.collideWorldBounds = true;
     game.input.onUp.add(function() {
-        game.physics.arcade.moveToXY(player, game.input.activePointer.worldX,
-            game.input.activePointer.worldY, 300);
+        moveTarget = game.add.sprite(game.input.activePointer.worldX,
+            game.input.activePointer.worldY, 'pix');
+        moveTarget.width = 5;
+        moveTarget.height = 5;
+        moveTarget.anchor.set(0.5);
+        game.physics.enable(moveTarget);
+        game.physics.arcade.moveToXY(player, moveTarget.x, moveTarget.y, 300);
     });
 };
 
 state.update = function() {
-    game.physics.arcade.collide(player, layer, function(player) {
+    game.physics.arcade.collide(player, layer, function() {
         player.body.velocity.set(0);
+        if (moveTarget) moveTarget.destroy();
     });
+    if (moveTarget)
+        game.physics.arcade.collide(player, moveTarget, function() {
+            player.body.velocity.set(0);
+            moveTarget.destroy();
+        });
 };
 
 module.exports = state;
