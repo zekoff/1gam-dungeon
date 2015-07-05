@@ -2,6 +2,8 @@
 module.exports = {
     preload: function() {
         game.load.baseURL = './assets/';
+        game.scale.pageAlignHorizontally = true;
+        game.scale.pageAlignVertically = true;
     },
     create: function() {
         game.load.image('pix', 'pix.png');
