@@ -91,17 +91,21 @@ state.create = function() {
         moveTarget.height = 5;
         moveTarget.anchor.set(0.5);
         game.physics.enable(moveTarget);
-        game.physics.arcade.moveToXY(player, moveTarget.x, moveTarget.y, 300);
+        // game.physics.arcade.moveToXY(player, moveTarget.x, moveTarget.y, 300);
     });
 };
 
 var reachedDestination = function() {
     player.body.velocity.set(0);
-    if (moveTarget) moveTarget.destroy();
+    if (moveTarget) {
+        moveTarget.destroy();
+        moveTarget = null;
+    }
 };
 
 state.update = function() {
-    game.physics.arcade.collide(player, layer, reachedDestination);
+    if (moveTarget) game.physics.arcade.moveToXY(player, moveTarget.x, moveTarget.y, 300);
+    game.physics.arcade.collide(player, layer);
     game.physics.arcade.collide(player, moveTarget, reachedDestination);
 };
 
