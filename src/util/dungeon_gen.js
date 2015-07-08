@@ -35,9 +35,10 @@ var Dungeon = {
 
         this.SquashRooms();
 
-        for (i = 0; i < room_count; i++) {
+        for (i = 1; i < room_count; i++) {
             var roomA = this.rooms[i];
-            var roomB = this.FindClosestRoom(roomA);
+            var roomB = game.rnd.pick(this.rooms.slice(0,i));
+            // then, go back and ensure first room is connected
 
             pointA = {
                 x: Helpers.GetRandom(roomA.x, roomA.x + roomA.w),
@@ -56,7 +57,7 @@ var Dungeon = {
                     if (pointB.y > pointA.y) pointB.y--;
                     else pointB.y++;
                 }
-
+                // break loop early if laying ground on existing ground
                 this.map[pointB.x][pointB.y] = 1;
             }
         }
