@@ -8,8 +8,18 @@ var Player = function(x, y) {
     this.anchor.set(0.5);
     game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
+    this.moveTarget = null;
 };
 Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
+
+Player.prototype.isAtDestination = function() {
+    if (this.moveTarget &&
+        game.physics.arcade.intersects(this, this.moveTarget)) {
+        this.body.velocity.set(0);
+        this.moveTarget.destroy();
+        this.moveTarget = null;
+    }
+};
 
 module.exports = Player;
