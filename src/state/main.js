@@ -2,6 +2,7 @@
 var state = {};
 var DungeonGen = require('../util/dungeon_gen');
 var Player = require('../entity/player');
+var Enemy = require('../entity/enemy');
 
 var WORLD_WIDTH = 64;
 var WORLD_HEIGHT = 64;
@@ -10,7 +11,7 @@ var players;
 var currentPlayer;
 var layer;
 
-var enemy;
+var enemies;
 
 state.create = function() {
     players = game.add.group();
@@ -35,17 +36,6 @@ state.create = function() {
             map.putTile(mapArray[i][j], i, j);
     map.setCollision(2);
     game.physics.arcade.setBoundsToWorld();
-    
-    // create enemies
-    var ex, ey;
-    ex = (DungeonGen.Dungeon.rooms[0].x + 1 ) * 32;
-    ey = (DungeonGen.Dungeon.rooms[0].y + 1 ) * 32;
-    enemy = game.add.sprite(ex, ey, 'pix');
-    enemy.width = 50;
-    enemy.height = 50;
-    enemy.tint = 0xff0000;
-    game.physics.arcade.enable(enemy);
-    enemy.body.immovable = true;
 
     // add input mask
     var mask = game.add.sprite(0, 0);
@@ -61,6 +51,21 @@ state.create = function() {
         currentPlayer.moveTarget.anchor.set(0.5);
         game.physics.enable(currentPlayer.moveTarget);
     });
+
+    // create enemies
+    enemies = game.add.group();
+    var ex, ey, enemy, room;
+    for (i = 0; i < 5; i++) {
+        room = game.rnd.between(0, DungeonGen.Dungeon.rooms.length - 1);
+        ex = (DungeonGen.Dungeon.rooms[room].x + 1) * 32;
+        ey = (DungeonGen.Dungeon.rooms[room].y + 1) * 32;
+        enemy = new Enemy(ex, ey);
+        enemy.inputEnabled = true;
+        enemy.events.onInputUp.add(function() {
+            currentPlayer.moveTarget = this;
+        }, enemy);
+        enemies.add(enemy);
+    }
 
     // add HUD
     var hud = {};
@@ -97,8 +102,8 @@ state.update = function() {
     });
     game.physics.arcade.collide(players, layer);
     players.callAll('isAtDestination');
-    
-    game.physics.arcade.collide(enemy, players);
+
+    game.physics.arcade.collide(players, enemies);
 };
 
 module.exports = state;
