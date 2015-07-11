@@ -10,6 +10,8 @@ var players;
 var currentPlayer;
 var layer;
 
+var enemy;
+
 state.create = function() {
     players = game.add.group();
     var p1 = new Player(50, 50);
@@ -34,14 +36,23 @@ state.create = function() {
     map.setCollision(2);
     game.physics.arcade.setBoundsToWorld();
     
+    // create enemies
+    var ex, ey;
+    ex = (DungeonGen.Dungeon.rooms[0].x + 1 ) * 32;
+    ey = (DungeonGen.Dungeon.rooms[0].y + 1 ) * 32;
+    enemy = game.add.sprite(ex, ey, 'pix');
+    enemy.width = 50;
+    enemy.height = 50;
+    enemy.tint = 0xff0000;
+    game.physics.arcade.enable(enemy);
+    enemy.body.immovable = true;
+
     // add input mask
-    var mask = game.add.sprite(0,0);
+    var mask = game.add.sprite(0, 0);
     mask.height = game.world.height;
     mask.width = game.world.width;
     mask.inputEnabled = true;
     mask.events.onInputUp.add(function() {
-        console.log(game.input.activePointer.worldX);
-        console.log(game.input.activePointer.worldY);
         if (currentPlayer.moveTarget) currentPlayer.moveTarget.destroy();
         currentPlayer.moveTarget = game.add.sprite(game.input.activePointer.worldX,
             game.input.activePointer.worldY, 'pix');
@@ -65,7 +76,6 @@ state.create = function() {
     hudGroup.add(hud.p2);
     hudGroup.add(hud.p3);
     var activatePlayer = function(player, sprite, pointer) {
-        console.log('player activated');
         currentPlayer = player;
         game.camera.follow(currentPlayer);
     };
@@ -87,6 +97,8 @@ state.update = function() {
     });
     game.physics.arcade.collide(players, layer);
     players.callAll('isAtDestination');
+    
+    game.physics.arcade.collide(enemy, players);
 };
 
 module.exports = state;
