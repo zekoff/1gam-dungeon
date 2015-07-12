@@ -8,25 +8,13 @@ var Waypoint = require('../util/waypoint');
 var WORLD_WIDTH = 64;
 var WORLD_HEIGHT = 64;
 
-var players;
 var currentPlayer;
 var layer;
-
 var enemies;
 
 state.create = function() {
-    players = game.add.group();
-    var p1 = new Player(50, 50);
-    var p2 = new Player(100, 50);
-    var p3 = new Player(50, 100);
-    players.add(p1);
-    players.add(p2);
-    players.add(p3);
-    currentPlayer = p1;
-    game.camera.follow(currentPlayer);
-    game.camera.roundPx = false;
     var map = game.add.tilemap();
-    map.addTilesetImage('test_tileset', 'test_tileset', 32, 32, 32, 32, 1);
+    map.addTilesetImage('test_tileset', 'test_tileset', 32, 32, 0, 0, 1);
     layer = map.create('walls', WORLD_WIDTH, WORLD_HEIGHT, 32, 32);
     layer.resizeWorld();
     var dungeon = new Dungeon();
@@ -39,6 +27,16 @@ state.create = function() {
             map.putTile(mapArray[i][j], i, j);
     map.setCollision(2);
     game.physics.arcade.setBoundsToWorld();
+    game.players = game.add.group();
+    var p1 = new Player(50, 50);
+    var p2 = new Player(100, 50);
+    var p3 = new Player(50, 100);
+    game.players.add(p1);
+    game.players.add(p2);
+    game.players.add(p3);
+    currentPlayer = p1;
+    game.camera.follow(currentPlayer);
+    game.camera.roundPx = false;
 
     // add input mask
     var mask = game.add.sprite(0, 0);
@@ -54,11 +52,8 @@ state.create = function() {
 
     // create enemies
     enemies = game.add.group();
-    var ex, ey, enemy, room;
+    var enemy;
     for (i = 0; i < 5; i++) {
-        // room = game.rnd.between(0, dungeon.rooms.length - 1);
-        // ex = (dungeon.rooms[room].x + 1) * 32;
-        // ey = (dungeon.rooms[room].y + 1) * 32;
         enemy = new Enemy(i);
         enemy.inputEnabled = true;
         enemy.events.onInputUp.add(function() {
@@ -96,8 +91,8 @@ state.create = function() {
 
 state.update = function() {
     // state updates first, then entities
-    game.physics.arcade.collide(players, layer);
-    game.physics.arcade.collide(players, enemies);
+    game.physics.arcade.collide(game.players, layer);
+    game.physics.arcade.collide(game.players, enemies);
 };
 
 module.exports = state;

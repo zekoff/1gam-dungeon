@@ -7,7 +7,9 @@ module.exports = {
     },
     create: function() {
         game.load.image('pix', 'pix.png');
-        game.load.image('test_tileset', 'pix.png', 32, 32);
+        game.load.image('test_tileset', 'sample_floors.png', 64, 16);
+        game.load.image('norbert', 'norbert.png');
+        game.load.image('orc', 'orc.png');
         game.load.start();
     },
     update: function() {

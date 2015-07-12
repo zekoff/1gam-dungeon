@@ -3,13 +3,13 @@
 var MAX_SWING_TIMER = 1; // seconds
 
 var Player = function(x, y) {
-    Phaser.Sprite.call(this, game, x, y, 'pix');
-    this.height = 20;
-    this.width = 20;
-    this.tint = 0x00ff00;
+    Phaser.Sprite.call(this, game, x, y, 'norbert');
+    this.height = 32;
+    this.width = 32;
     this.anchor.set(0.5);
     game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
+    this.body.setSize(20, 20, 6, 6);
     this.target = null;
     this.hp = 100;
     this.atk = 5;
@@ -42,7 +42,7 @@ Player.prototype.update = function() {
     this.isAtDestination();
     if (this.target === null) return;
     if (this.target.targetType === 'enemy' &&
-        game.physics.arcade.distanceBetween(this, this.target) < 40) {
+        game.physics.arcade.distanceBetween(this, this.target) < 50) {
         this.swingTimer += game.time.physicsElapsed;
     }
     if (this.swingTimer > MAX_SWING_TIMER) {

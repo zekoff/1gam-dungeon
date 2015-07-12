@@ -7,14 +7,15 @@ var Enemy = function(roomNumber) {
     var randomLocationInRoom = game.dungeon.pickRandomTileInRoom(roomNumber);
     var x = randomLocationInRoom.x * 32;
     var y = randomLocationInRoom.y * 32;
-    Phaser.Sprite.call(this, game, x, y, 'pix');
+    Phaser.Sprite.call(this, game, x, y, 'orc');
     this.roomNumber = roomNumber;
-    this.height = 40;
-    this.width = 40;
+    this.height = 32;
+    this.width = 32;
     this.tint = 0xff0000;
     this.anchor.set(0.5);
     game.physics.arcade.enable(this);
     this.body.immovable = true;
+    this.body.setSize(34, 34, -1, -1);
     this.hp = 15;
     this.atk = 5;
     this.swingTimer = 0;
