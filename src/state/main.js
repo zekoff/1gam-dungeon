@@ -47,9 +47,8 @@ state.create = function() {
     mask.events.onInputUp.add(function(sprite, pointer) {
         console.log('Clicked in room ' + dungeon.getContainingRoom(
             layer.getTileX(pointer.worldX), layer.getTileY(pointer.worldY)));
-        var wp = new Waypoint(pointer.worldX, pointer.worldY);
-        game.add.existing(wp);
-        currentPlayer.setTarget(wp);
+        currentPlayer.setTarget(game.add.existing(
+            new Waypoint(pointer.worldX, pointer.worldY)));
     });
 
     // create enemies
@@ -97,9 +96,9 @@ state.create = function() {
 state.update = function() {
     // state updates first, then entities
     players.forEach(function(player) {
-        if (player.moveTarget)
-            game.physics.arcade.moveToXY(player, player.moveTarget.x,
-                player.moveTarget.y, 300);
+        if (player.target)
+            game.physics.arcade.moveToXY(player, player.target.x,
+                player.target.y, 300);
     });
     game.physics.arcade.collide(players, layer);
     players.callAll('isAtDestination');
