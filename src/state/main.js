@@ -30,6 +30,7 @@ state.create = function() {
     layer = map.create('walls', WORLD_WIDTH, WORLD_HEIGHT, 32, 32);
     layer.resizeWorld();
     var dungeon = new Dungeon();
+    game.dungeon = dungeon;
     dungeon.generate();
     var mapArray = dungeon.map;
     var i, j;
@@ -45,7 +46,7 @@ state.create = function() {
     mask.width = game.world.width;
     mask.inputEnabled = true;
     mask.events.onInputUp.add(function(sprite, pointer) {
-        console.log('Clicked in room ' + dungeon.getContainingRoom(
+        print('Clicked in room ' + dungeon.getContainingRoom(
             layer.getTileX(pointer.worldX), layer.getTileY(pointer.worldY)));
         currentPlayer.setTarget(game.add.existing(
             new Waypoint(pointer.worldX, pointer.worldY)));
@@ -55,10 +56,10 @@ state.create = function() {
     enemies = game.add.group();
     var ex, ey, enemy, room;
     for (i = 0; i < 5; i++) {
-        room = game.rnd.between(0, dungeon.rooms.length - 1);
-        ex = (dungeon.rooms[room].x + 1) * 32;
-        ey = (dungeon.rooms[room].y + 1) * 32;
-        enemy = new Enemy(ex, ey);
+        // room = game.rnd.between(0, dungeon.rooms.length - 1);
+        // ex = (dungeon.rooms[room].x + 1) * 32;
+        // ey = (dungeon.rooms[room].y + 1) * 32;
+        enemy = new Enemy(i);
         enemy.inputEnabled = true;
         enemy.events.onInputUp.add(function() {
             currentPlayer.setTarget(this);
@@ -95,14 +96,7 @@ state.create = function() {
 
 state.update = function() {
     // state updates first, then entities
-    players.forEach(function(player) {
-        if (player.target)
-            game.physics.arcade.moveToXY(player, player.target.x,
-                player.target.y, 300);
-    });
     game.physics.arcade.collide(players, layer);
-    players.callAll('isAtDestination');
-
     game.physics.arcade.collide(players, enemies);
 };
 

@@ -1,4 +1,8 @@
 /* global game, Phaser */
+
+/*
+Waypoint x/y arguments are in world pixels.
+*/
 var Waypoint = function(x, y) {
     Phaser.Sprite.call(this, game, x, y, 'pix');
     this.width = 5;

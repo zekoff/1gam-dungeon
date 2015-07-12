@@ -1,4 +1,4 @@
-/* global game */
+/* global game, Phaser */
 
 var Dungeon = function() {
     this.map = null;
@@ -160,6 +160,11 @@ Dungeon.prototype.getContainingRoom = function(x, y) {
             return i;
     }
     return -1;
+};
+Dungeon.prototype.pickRandomTileInRoom = function(roomNumber) {
+    var room = this.rooms[roomNumber];
+    return new Phaser.Point(game.rnd.between(room.x + 1, room.x + room.w - 1),
+        game.rnd.between(room.y + 1, room.y + room.h - 1));
 };
 
 module.exports = Dungeon;

@@ -14,6 +14,7 @@ var Player = function(x, y) {
     this.hp = 100;
     this.atk = 5;
     this.swingTimer = 0;
+    this.runSpeed = 200;
 };
 Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
@@ -35,6 +36,10 @@ Player.prototype.setTarget = function(target) {
 };
 
 Player.prototype.update = function() {
+    if (this.target)
+        game.physics.arcade.moveToXY(this, this.target.x, this.target.y,
+            this.runSpeed);
+    this.isAtDestination();
     if (this.target === null) return;
     if (this.target.targetType === 'enemy' &&
         game.physics.arcade.distanceBetween(this, this.target) < 40) {
