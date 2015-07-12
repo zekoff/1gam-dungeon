@@ -28,8 +28,9 @@ state.create = function() {
     map.addTilesetImage('test_tileset', 'test_tileset', 32, 32, 32, 32, 1);
     layer = map.create('walls', WORLD_WIDTH, WORLD_HEIGHT, 32, 32);
     layer.resizeWorld();
-    Dungeon.Generate();
-    var mapArray = Dungeon.map;
+    var dungeon = new Dungeon();
+    dungeon.generate();
+    var mapArray = dungeon.map;
     var i, j;
     for (i = 0; i < WORLD_WIDTH; i++)
         for (j = 0; j < WORLD_HEIGHT; j++)
@@ -43,6 +44,9 @@ state.create = function() {
     mask.width = game.world.width;
     mask.inputEnabled = true;
     mask.events.onInputUp.add(function() {
+        console.log('Clicked in room ' + dungeon.getContainingRoom(
+            layer.getTileX(game.input.activePointer.worldX),
+            layer.getTileY(game.input.activePointer.worldY)));
         if (currentPlayer.moveTarget) currentPlayer.moveTarget.destroy();
         currentPlayer.moveTarget = game.add.sprite(game.input.activePointer.worldX,
             game.input.activePointer.worldY, 'pix');
@@ -56,9 +60,9 @@ state.create = function() {
     enemies = game.add.group();
     var ex, ey, enemy, room;
     for (i = 0; i < 5; i++) {
-        room = game.rnd.between(0, Dungeon.rooms.length - 1);
-        ex = (Dungeon.rooms[room].x + 1) * 32;
-        ey = (Dungeon.rooms[room].y + 1) * 32;
+        room = game.rnd.between(0, dungeon.rooms.length - 1);
+        ex = (dungeon.rooms[room].x + 1) * 32;
+        ey = (dungeon.rooms[room].y + 1) * 32;
         enemy = new Enemy(ex, ey);
         enemy.inputEnabled = true;
         enemy.events.onInputUp.add(function() {
