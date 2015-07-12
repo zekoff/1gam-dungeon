@@ -3,6 +3,7 @@ var state = {};
 var Dungeon = require('../util/dungeon_gen');
 var Player = require('../entity/player');
 var Enemy = require('../entity/enemy');
+var Waypoint = require('../util/waypoint');
 
 var WORLD_WIDTH = 64;
 var WORLD_HEIGHT = 64;
@@ -43,17 +44,12 @@ state.create = function() {
     mask.height = game.world.height;
     mask.width = game.world.width;
     mask.inputEnabled = true;
-    mask.events.onInputUp.add(function() {
+    mask.events.onInputUp.add(function(sprite, pointer) {
         console.log('Clicked in room ' + dungeon.getContainingRoom(
-            layer.getTileX(game.input.activePointer.worldX),
-            layer.getTileY(game.input.activePointer.worldY)));
-        if (currentPlayer.moveTarget) currentPlayer.moveTarget.destroy();
-        currentPlayer.moveTarget = game.add.sprite(game.input.activePointer.worldX,
-            game.input.activePointer.worldY, 'pix');
-        currentPlayer.moveTarget.width = 5;
-        currentPlayer.moveTarget.height = 5;
-        currentPlayer.moveTarget.anchor.set(0.5);
-        game.physics.enable(currentPlayer.moveTarget);
+            layer.getTileX(pointer.worldX), layer.getTileY(pointer.worldY)));
+        var wp = new Waypoint(pointer.worldX, pointer.worldY);
+        game.add.existing(wp);
+        currentPlayer.setTarget(wp);
     });
 
     // create enemies
@@ -66,7 +62,7 @@ state.create = function() {
         enemy = new Enemy(ex, ey);
         enemy.inputEnabled = true;
         enemy.events.onInputUp.add(function() {
-            currentPlayer.moveTarget = this;
+            currentPlayer.setTarget(this);
         }, enemy);
         enemies.add(enemy);
     }
@@ -99,6 +95,7 @@ state.create = function() {
 };
 
 state.update = function() {
+    // state updates first, then entities
     players.forEach(function(player) {
         if (player.moveTarget)
             game.physics.arcade.moveToXY(player, player.moveTarget.x,

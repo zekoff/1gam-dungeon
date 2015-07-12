@@ -16,6 +16,7 @@ var Room = function() {
 };
 
 Dungeon.prototype.generate = function() {
+    console.log('generating dungeon');
     // Init map as 2D array filled with 0s
     this.map = [];
     for (var x = 0; x < this.map_size; x++) {
@@ -98,6 +99,7 @@ Dungeon.prototype.generate = function() {
             }
         }
     }
+    console.log('finished generating');
 };
 Dungeon.prototype.findClosestRoom = function(room) {
     var mid = {

@@ -9,6 +9,8 @@ var Player = function(x, y) {
     game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
     this.moveTarget = null;
+    this.hp = 100;
+    this.atk = 5;
 };
 Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
@@ -21,5 +23,13 @@ Player.prototype.isAtDestination = function() {
         this.moveTarget = null;
     }
 };
+
+Player.prototype.setTarget = function(target) {
+    if (this.moveTarget && this.moveTarget.targetType === 'waypoint')
+        this.moveTarget.destroy();
+    this.moveTarget = target;
+};
+
+Player.prototype.update = function() {};
 
 module.exports = Player;
