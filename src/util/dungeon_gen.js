@@ -1,3 +1,11 @@
+/* global game */
+
+// var Dungeon = function() {
+//     this.map = null;
+//     this.mapSize = 64;
+//     this.rooms = [];
+// };
+
 var Dungeon = {
     map: null,
     map_size: 64,
@@ -11,17 +19,17 @@ var Dungeon = {
             }
         }
 
-        var room_count = Helpers.GetRandom(10, 20);
+        var room_count = game.rnd.between(10,20);
         var min_size = 5;
         var max_size = 15;
 
         for (var i = 0; i < room_count; i++) {
             var room = {};
 
-            room.x = Helpers.GetRandom(1, this.map_size - max_size - 1);
-            room.y = Helpers.GetRandom(1, this.map_size - max_size - 1);
-            room.w = Helpers.GetRandom(min_size, max_size);
-            room.h = Helpers.GetRandom(min_size, max_size);
+            room.x = game.rnd.between(1, this.map_size - max_size - 1);
+            room.y = game.rnd.between(1, this.map_size - max_size - 1);
+            room.w = game.rnd.between(min_size, max_size);
+            room.h = game.rnd.between(min_size, max_size);
 
             if (this.DoesCollide(room)) {
                 i--;
@@ -35,18 +43,19 @@ var Dungeon = {
 
         this.SquashRooms();
 
+        var pointA, pointB;
         for (i = 1; i < room_count; i++) {
             var roomA = this.rooms[i];
             var roomB = game.rnd.pick(this.rooms.slice(0,i));
             // then, go back and ensure first room is connected
 
             pointA = {
-                x: Helpers.GetRandom(roomA.x, roomA.x + roomA.w),
-                y: Helpers.GetRandom(roomA.y, roomA.y + roomA.h)
+                x: game.rnd.between(roomA.x, roomA.x + roomA.w),
+                y: game.rnd.between(roomA.y, roomA.y + roomA.h)
             };
             pointB = {
-                x: Helpers.GetRandom(roomB.x, roomB.x + roomB.w),
-                y: Helpers.GetRandom(roomB.y, roomB.y + roomB.h)
+                x: game.rnd.between(roomB.x, roomB.x + roomB.w),
+                y: game.rnd.between(roomB.y, roomB.y + roomB.h)
             };
 
             while ((pointB.x != pointA.x) || (pointB.y != pointA.y)) {
@@ -63,7 +72,7 @@ var Dungeon = {
         }
 
         for (i = 0; i < room_count; i++) {
-            var room = this.rooms[i];
+            room = this.rooms[i];
             for (var x = room.x; x < room.x + room.w; x++) {
                 for (var y = room.y; y < room.y + room.h; y++) {
                     this.map[x][y] = 1;
@@ -137,40 +146,4 @@ var Dungeon = {
     }
 };
 
-// var Renderer = {
-//     canvas: null,
-//     ctx: null,
-//     size: 512,
-//     scale: 0,
-//     Initialize: function () {
-//         this.canvas = document.getElementById('canvas');
-//         this.canvas.width = this.size;
-//         this.canvas.height = this.size;
-//         this.ctx = canvas.getContext('2d');
-//         this.scale = this.canvas.width / Dungeon.map_size;
-//     },
-//     Update: function () {
-//         for (var y = 0; y < Dungeon.map_size; y++) {
-//             for (var x = 0; x < Dungeon.map_size; x++) {
-//                 var tile = Dungeon.map[x][y];
-//                 if (tile == 0) this.ctx.fillStyle = '#351330';
-//                 else if (tile == 1) this.ctx.fillStyle = '#64908A';
-//                 else this.ctx.fillStyle = '#424254';
-//                 this.ctx.fillRect(x * this.scale, y * this.scale, this.scale, this.scale);
-//             }
-//         }
-//     }
-// };
-
-var Helpers = {
-    GetRandom: function (low, high) {
-        return~~ (Math.random() * (high - low)) + low;
-    }
-};
-
-// Dungeon.Generate();
-// Renderer.Initialize();
-// Renderer.Update(Dungeon.map);
-
-module.exports.Dungeon = Dungeon;
-module.exports.Helpers = Helpers;
+module.exports = Dungeon;

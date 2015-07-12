@@ -1,6 +1,6 @@
 /* global game */
 var state = {};
-var DungeonGen = require('../util/dungeon_gen');
+var Dungeon = require('../util/dungeon_gen');
 var Player = require('../entity/player');
 var Enemy = require('../entity/enemy');
 
@@ -28,8 +28,8 @@ state.create = function() {
     map.addTilesetImage('test_tileset', 'test_tileset', 32, 32, 32, 32, 1);
     layer = map.create('walls', WORLD_WIDTH, WORLD_HEIGHT, 32, 32);
     layer.resizeWorld();
-    DungeonGen.Dungeon.Generate();
-    var mapArray = DungeonGen.Dungeon.map;
+    Dungeon.Generate();
+    var mapArray = Dungeon.map;
     var i, j;
     for (i = 0; i < WORLD_WIDTH; i++)
         for (j = 0; j < WORLD_HEIGHT; j++)
@@ -56,9 +56,9 @@ state.create = function() {
     enemies = game.add.group();
     var ex, ey, enemy, room;
     for (i = 0; i < 5; i++) {
-        room = game.rnd.between(0, DungeonGen.Dungeon.rooms.length - 1);
-        ex = (DungeonGen.Dungeon.rooms[room].x + 1) * 32;
-        ey = (DungeonGen.Dungeon.rooms[room].y + 1) * 32;
+        room = game.rnd.between(0, Dungeon.rooms.length - 1);
+        ex = (Dungeon.rooms[room].x + 1) * 32;
+        ey = (Dungeon.rooms[room].y + 1) * 32;
         enemy = new Enemy(ex, ey);
         enemy.inputEnabled = true;
         enemy.events.onInputUp.add(function() {
