@@ -48,7 +48,7 @@ Dungeon.prototype.generate = function() {
         this.rooms.push(room);
     }
 
-    this.squashRooms();
+    // this.squashRooms();
 
     var pointA, pointB;
     for (i = 1; i < room_count; i++) {

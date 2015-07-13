@@ -28,9 +28,14 @@ state.create = function() {
     map.setCollision(2);
     game.physics.arcade.setBoundsToWorld();
     game.players = game.add.group();
-    var p1 = new Player(50, 50);
-    var p2 = new Player(100, 50);
-    var p3 = new Player(50, 100);
+    var randomRoom = dungeon.rooms[game.rnd.between(0, dungeon.rooms.length - 1)];
+    var centerOfRoom = {
+        x: (randomRoom.x + randomRoom.w / 2) * 32,
+        y: (randomRoom.y + randomRoom.h / 2) * 32
+    };
+    var p1 = new Player(centerOfRoom.x, centerOfRoom.y - 16, 'norbert');
+    var p2 = new Player(centerOfRoom.x - 16, centerOfRoom.y + 16, 'agnes');
+    var p3 = new Player(centerOfRoom.x + 16, centerOfRoom.y + 16, 'frederick');
     game.players.add(p1);
     game.players.add(p2);
     game.players.add(p3);
@@ -61,6 +66,7 @@ state.create = function() {
         }, enemy);
         enemies.add(enemy);
     }
+    game.world.bringToTop(game.players);
 
     // add HUD
     var hud = {};

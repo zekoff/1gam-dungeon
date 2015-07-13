@@ -15,7 +15,7 @@ var Enemy = function(roomNumber) {
     this.anchor.set(0.5);
     game.physics.arcade.enable(this);
     this.body.immovable = true;
-    this.body.setSize(34, 34, -1, -1);
+    this.body.setSize(36, 36);
     this.hp = 15;
     this.atk = 5;
     this.swingTimer = 0;

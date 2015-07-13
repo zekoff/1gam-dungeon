@@ -2,14 +2,14 @@
 
 var MAX_SWING_TIMER = 1; // seconds
 
-var Player = function(x, y) {
-    Phaser.Sprite.call(this, game, x, y, 'norbert');
+var Player = function(x, y, key) {
+    Phaser.Sprite.call(this, game, x, y, key);
     this.height = 32;
     this.width = 32;
     this.anchor.set(0.5);
     game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
-    this.body.setSize(20, 20, 6, 6);
+    this.body.setSize(20, 20);
     this.target = null;
     this.hp = 100;
     this.atk = 5;

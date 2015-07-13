@@ -9,6 +9,8 @@ module.exports = {
         game.load.image('pix', 'pix.png');
         game.load.image('test_tileset', 'sample_floors.png', 64, 16);
         game.load.image('norbert', 'norbert.png');
+        game.load.image('agnes', 'agnes.png');
+        game.load.image('frederick', 'frederick.png');
         game.load.image('orc', 'orc.png');
         game.load.start();
     },
