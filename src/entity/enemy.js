@@ -69,14 +69,16 @@ var createAttackAi = function(self, target) {
         if (game.dungeon.getContainingRoomPixels(target.x, target.y) !== this.roomNumber) {
             this.ai.pop();
             this.setRandomWaypoint();
+            return;
         }
-        if (this.target)
-            game.physics.arcade.moveToXY(this, this.target.x, this.target.y,
-                this.runSpeed);
         if (this.target.targetType === 'player' &&
-            game.physics.arcade.distanceBetween(this, this.target) < 55) {
+            game.physics.arcade.distanceBetween(this, this.target) < 45) {
+            this.body.velocity.set(0);
             this.swingTimer += game.time.physicsElapsed;
         }
+        else if (this.target)
+            game.physics.arcade.moveToXY(this, this.target.x, this.target.y,
+                this.runSpeed);
         if (this.swingTimer > MAX_SWING_TIMER) {
             this.target.hp -= this.atk;
             this.swingTimer = 0;
