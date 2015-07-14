@@ -152,6 +152,10 @@ Dungeon.prototype.doesCollide = function(room, ignore) {
     }
     return false;
 };
+
+/*
+Get the room containing this entity, given x/y values in tiles.
+*/
 Dungeon.prototype.getContainingRoom = function(x, y) {
     var room;
     for (var i = 0; i < this.rooms.length; i++) {
@@ -161,6 +165,17 @@ Dungeon.prototype.getContainingRoom = function(x, y) {
     }
     return -1;
 };
+
+/*
+Get the room containing this entity, given x/y values in pixels.
+*/
+Dungeon.prototype.getContainingRoomPixels = function(x, y) {
+    return this.getContainingRoom(Math.floor(x / 32), Math.floor(y / 32));
+};
+
+/*
+Pick a random tile inside the given room and return its x/y location in tiles.
+*/
 Dungeon.prototype.pickRandomTileInRoom = function(roomNumber) {
     var room = this.rooms[roomNumber];
     return new Phaser.Point(game.rnd.between(room.x + 1, room.x + room.w - 1),

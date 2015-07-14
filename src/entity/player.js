@@ -10,11 +10,13 @@ var Player = function(x, y, key) {
     game.physics.arcade.enable(this);
     this.body.collideWorldBounds = true;
     this.body.setSize(20, 20);
+    // this.body.immovable = true;
     this.target = null;
     this.hp = 100;
     this.atk = 5;
     this.swingTimer = 0;
     this.runSpeed = 200;
+    this.targetType = 'player';
 };
 Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
@@ -42,7 +44,7 @@ Player.prototype.update = function() {
     this.isAtDestination();
     if (this.target === null) return;
     if (this.target.targetType === 'enemy' &&
-        game.physics.arcade.distanceBetween(this, this.target) < 50) {
+        game.physics.arcade.distanceBetween(this, this.target) < 55) {
         this.swingTimer += game.time.physicsElapsed;
     }
     if (this.swingTimer > MAX_SWING_TIMER) {
