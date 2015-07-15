@@ -1,6 +1,7 @@
 /* global game, Phaser */
 
 var MAX_SWING_TIMER = 1; // seconds
+var MAX_IDLE_TIME = 2;
 
 var Player = function(x, y, key) {
     Phaser.Sprite.call(this, game, x, y, key);
@@ -17,18 +18,11 @@ var Player = function(x, y, key) {
     this.swingTimer = 0;
     this.runSpeed = 200;
     this.targetType = 'player';
+
+    this.idleTime = 0;
 };
 Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
-
-Player.prototype.isAtDestination = function() {
-    if (this.target &&
-        game.physics.arcade.intersects(this, this.target)) {
-        this.body.velocity.set(0);
-        this.target.destroy();
-        this.target = null;
-    }
-};
 
 Player.prototype.setTarget = function(target) {
     if (this.target && this.target.targetType === 'waypoint')
@@ -38,25 +32,62 @@ Player.prototype.setTarget = function(target) {
 };
 
 Player.prototype.update = function() {
-    if (this.target)
-        game.physics.arcade.moveToXY(this, this.target.x, this.target.y,
-            this.runSpeed);
-    this.isAtDestination();
-    if (this.target === null) return;
-    if (this.target.targetType === 'enemy' &&
-        game.physics.arcade.distanceBetween(this, this.target) < 55) {
-        this.swingTimer += game.time.physicsElapsed;
+    if (this.target) {
+        this.idleTime = 0;
+        switch (this.target.targetType) {
+            case 'waypoint':
+                this.moveToWaypoint();
+                break;
+            case 'enemy':
+                this.attackEnemy();
+                break;
+            case 'object':
+                this.interactWithObject();
+                break;
+        }
     }
+    else this.idle();
+};
+
+Player.prototype.idle = function() {
+    var previouslyIdling = this.idleTime < MAX_IDLE_TIME;
+    this.idleTime += game.time.physicsElapsed;
+    if (this.idleTime >= MAX_IDLE_TIME && previouslyIdling) print('now idling');
+    if (this.idleTime < MAX_IDLE_TIME) return;
+    // if enemies in room, attack them
+    // if room is empty, search for treasure
+};
+
+Player.prototype.moveToWaypoint = function() {
+    game.physics.arcade.moveToXY(this, this.target.x, this.target.y,
+        this.runSpeed);
+    if (game.physics.arcade.intersects(this, this.target)) {
+        this.body.velocity.set(0);
+        this.target.destroy();
+        this.target = null;
+    }
+};
+
+Player.prototype.attackEnemy = function() {
+    game.physics.arcade.moveToXY(this, this.target.x, this.target.y,
+        this.runSpeed);
+    if (game.physics.arcade.distanceBetween(this, this.target) < 55)
+        this.swingTimer += game.time.physicsElapsed;
     if (this.swingTimer > MAX_SWING_TIMER) {
         this.target.hp -= this.atk;
         this.swingTimer = 0;
         print('swing');
     }
-    if (this.target.targetType === 'enemy' && this.target.hp <= 0) {
+    if (this.target.hp <= 0) {
+        // this will cause a crash if more than one player is targeting this enemy
         this.target.destroy();
         this.target = null;
         this.body.velocity.set(0);
     }
+};
+
+Player.prototype.interactWithObject = function() {
+
 };
 
 module.exports = Player;
