@@ -36,10 +36,10 @@ Player.prototype.update = function() {
         this.idleTime = 0;
         switch (this.target.targetType) {
             case 'waypoint':
-                this.moveToWaypoint();
+                this.moveToWaypoint('target');
                 break;
             case 'enemy':
-                this.attackEnemy();
+                this.attackEnemy('target');
                 break;
             case 'object':
                 this.interactWithObject();
@@ -55,38 +55,48 @@ Player.prototype.idle = function() {
     if (this.idleTime >= MAX_IDLE_TIME && previouslyIdling) print('now idling');
     if (this.idleTime < MAX_IDLE_TIME) return;
     // if enemies in room, attack them
+    for (var i = 0; i < game.enemies.children.length; i++) {
+        var enemy = game.enemies.children[i];
+        var myRoom = game.dungeon.getContainingRoomPixels(this.x, this.y);
+        if (enemy.roomNumber === myRoom) {
+            this.idleTarget = enemy;
+            break;
+        }
+    }
+    if (this.idleTarget === null) return;
+    if (this.idleTarget.targetType === 'enemy') this.attackEnemy('idleTarget');
     // if room is empty, search for treasure
 };
 
-Player.prototype.moveToWaypoint = function() {
-    game.physics.arcade.moveToXY(this, this.target.x, this.target.y,
+Player.prototype.moveToWaypoint = function(target) {
+    game.physics.arcade.moveToXY(this, this[target].x, this[target].y,
         this.runSpeed);
-    if (game.physics.arcade.intersects(this, this.target)) {
+    if (game.physics.arcade.intersects(this, this[target])) {
         this.body.velocity.set(0);
-        this.target.destroy();
-        this.target = null;
+        this[target].destroy();
+        this[target] = null;
     }
 };
 
-Player.prototype.attackEnemy = function() {
-    game.physics.arcade.moveToXY(this, this.target.x, this.target.y,
+Player.prototype.attackEnemy = function(target) {
+    game.physics.arcade.moveToXY(this, this[target].x, this[target].y,
         this.runSpeed);
-    if (game.physics.arcade.distanceBetween(this, this.target) < 55)
+    if (game.physics.arcade.distanceBetween(this, this[target]) < 55)
         this.swingTimer += game.time.physicsElapsed;
     if (this.swingTimer > MAX_SWING_TIMER) {
-        this.target.hp -= this.atk;
+        this[target].hp -= this.atk;
         this.swingTimer = 0;
         print('swing');
     }
-    if (this.target.hp <= 0) {
+    if (this[target].hp <= 0) {
         // this will cause a crash if more than one player is targeting this enemy
-        this.target.destroy();
-        this.target = null;
+        this[target].destroy();
+        this[target] = null;
         this.body.velocity.set(0);
     }
 };
 
-Player.prototype.interactWithObject = function() {
+Player.prototype.interactWithObject = function(target) {
 
 };
 

@@ -10,7 +10,6 @@ var WORLD_HEIGHT = 64;
 
 var currentPlayer;
 var layer;
-var enemies;
 
 state.create = function() {
     var map = game.add.tilemap();
@@ -56,7 +55,7 @@ state.create = function() {
     });
 
     // create enemies
-    enemies = game.add.group();
+    game.enemies = game.add.group();
     var enemy;
     for (i = 0; i < 5; i++) {
         enemy = new Enemy(i);
@@ -64,7 +63,7 @@ state.create = function() {
         enemy.events.onInputUp.add(function() {
             currentPlayer.setTarget(this);
         }, enemy);
-        enemies.add(enemy);
+        game.enemies.add(enemy);
     }
     game.world.bringToTop(game.players);
 
@@ -98,7 +97,7 @@ state.create = function() {
 state.update = function() {
     // state updates first, then entities
     game.physics.arcade.collide(game.players, layer);
-    game.physics.arcade.collide(game.players, enemies);
+    game.physics.arcade.collide(game.players, game.enemies);
 };
 
 module.exports = state;
