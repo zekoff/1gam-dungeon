@@ -63,7 +63,7 @@ Player.prototype.idle = function() {
             break;
         }
     }
-    if (this.idleTarget === null) return;
+    if (!this.idleTarget) return;
     if (this.idleTarget.targetType === 'enemy') this.attackEnemy('idleTarget');
     // if room is empty, search for treasure
 };

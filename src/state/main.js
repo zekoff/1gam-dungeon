@@ -1,4 +1,4 @@
-/* global game */
+/* global Phaser, game */
 var state = {};
 var Dungeon = require('../util/dungeon_gen');
 var Player = require('../entity/player');
@@ -10,6 +10,7 @@ var WORLD_HEIGHT = 64;
 
 var currentPlayer;
 var layer;
+var cameraTween;
 
 state.create = function() {
     var map = game.add.tilemap();
@@ -82,7 +83,16 @@ state.create = function() {
     hudGroup.add(hud.p3);
     var activatePlayer = function(player, sprite, pointer) {
         currentPlayer = player;
-        game.camera.follow(currentPlayer);
+        game.camera.unfollow();
+        if (cameraTween) cameraTween.stop();
+        cameraTween = game.tweens.create(game.camera);
+        cameraTween.to({
+            x: player.x - 400,
+            y: player.y - 300
+        }).onComplete.add(function() {
+            game.camera.follow(player);
+        });
+        cameraTween.start();
     };
     [hud.p1, hud.p2, hud.p3].forEach(function(e) {
         e.inputEnabled = true;
