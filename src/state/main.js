@@ -1,6 +1,7 @@
 /* global Phaser, game */
 var state = {};
 var Dungeon = require('../util/dungeon_gen');
+var D2 = require('../util/dungeon_gen_2');
 var Player = require('../entity/player');
 var Enemy = require('../entity/enemy');
 var Waypoint = require('../util/waypoint');
@@ -13,6 +14,11 @@ var layer;
 var cameraTween;
 
 state.create = function() {
+    // XXX delete me
+    var d2 = new D2;
+    print(d2.tree);
+    d2.prettyPrint();
+
     var map = game.add.tilemap();
     map.addTilesetImage('test_tileset', 'test_tileset', 32, 32, 0, 0, 1);
     layer = map.create('walls', WORLD_WIDTH, WORLD_HEIGHT, 32, 32);
