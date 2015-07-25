@@ -104,8 +104,8 @@ TreeNode.prototype.connectRooms = function() {
     if (this.room) return;
     this.leftChild.connectRooms();
     this.rightChild.connectRooms();
-    var leftRoom = pickFromArray(this.getRooms());
-    var rightRoom = pickFromArray(this.getRooms());
+    var leftRoom = pickFromArray(this.leftChild.getRooms());
+    var rightRoom = pickFromArray(this.rightChild.getRooms());
     // work from left room to right room, connecting
     this.hallway = [];
     this.leftTerminus = null;
@@ -208,4 +208,5 @@ Dungeon.prototype.prettyPrint = function() {
     }
 };
 
-module.exports = Dungeon;
+if (typeof module !== 'undefined')
+    module.exports = Dungeon;
