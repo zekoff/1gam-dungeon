@@ -143,24 +143,24 @@ TreeNode.prototype.connectRooms = function() {
         nextPoint.y += distance / Math.abs(distance);
         this.hallway.push(clonePoint(nextPoint));
     }
-    // this.hallway.push(clonePoint(this.rightTerminus));
+    this.hallway.push(clonePoint(this.rightTerminus));
 };
 TreeNode.prototype.createMap = function() {
     var map = [];
     for (var i = 0; i < this.width; i++) {
         map[i] = [];
         for (var j = 0; j < this.height; j++)
-            map[i].push(".");
+            map[i].push(0);
     }
     this.getRooms().forEach(function(room) {
         for (var cellX = room.x; cellX < room.width + room.x; cellX++)
             for (var cellY = room.y; cellY < room.height + room.y; cellY++)
-                map[cellX][cellY] = "0";
+                map[cellX][cellY] = 1;
     });
     this.getHallways([]).forEach(function(hallway) {
         hallway.forEach(function(point) {
             // if (map[point.x][point.y] === "0") return;
-            map[point.x][point.y] = "+";
+            map[point.x][point.y] = 1;
         });
     });
     return map;
@@ -191,12 +191,30 @@ var Dungeon = function() {
     this.tree.createChildren(RECURSION_LEVEL);
     this.tree.connectRooms();
     this.map = this.tree.createMap();
+    this.buildWalls();
     this.rooms = this.tree.getRooms();
 };
 Dungeon.prototype = {};
 Dungeon.prototype.buildWalls = function() {
-    // iterate through every cell
-    // if it is 1, fill any adjacent cell (8 directions) that is 0 with 2
+    var buildWallIfEmpty = function(x, y) {
+        try {
+            if (this.map[x][y] === 0) this.map[x][y] = 2;
+        }
+        catch (e) {}
+    };
+    for (var i = 0; i < this.map.length; i++) {
+        for (var j = 0; j < this.map[0].length; j++) {
+            if (this.map[i][j] === 1) {
+                // debugger;
+                // fill every adjacent cell that is 0 with 2
+                [i - 1, i, i + 1].forEach(function(m) {
+                    [j - 1, j, j + 1].forEach(function(n) {
+                        buildWallIfEmpty.call(this, m, n);
+                    }, this);
+                }, this);
+            }
+        }
+    }
 };
 Dungeon.prototype.prettyPrint = function() {
     var line;
