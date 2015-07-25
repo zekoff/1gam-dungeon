@@ -15,15 +15,15 @@ var cameraTween;
 
 state.create = function() {
     // XXX delete me
-    var d3 = new D3;
+    // var d3 = new D3;
 
     var map = game.add.tilemap();
     map.addTilesetImage('test_tileset', 'test_tileset', 32, 32, 0, 0, 1);
     layer = map.create('walls', WORLD_WIDTH, WORLD_HEIGHT, 32, 32);
     layer.resizeWorld();
-    var dungeon = new Dungeon();
+    var dungeon = new D3();
     game.dungeon = dungeon;
-    dungeon.generate();
+    // dungeon.generate();
     var mapArray = dungeon.map;
     var i, j;
     for (i = 0; i < WORLD_WIDTH; i++)
@@ -34,8 +34,8 @@ state.create = function() {
     game.players = game.add.group();
     var randomRoom = dungeon.rooms[game.rnd.between(0, dungeon.rooms.length - 1)];
     var centerOfRoom = {
-        x: (randomRoom.x + randomRoom.w / 2) * 32,
-        y: (randomRoom.y + randomRoom.h / 2) * 32
+        x: (randomRoom.x + randomRoom.width / 2) * 32,
+        y: (randomRoom.y + randomRoom.height / 2) * 32
     };
     var p1 = new Player(centerOfRoom.x, centerOfRoom.y - 16, 'norbert');
     var p2 = new Player(centerOfRoom.x - 16, centerOfRoom.y + 16, 'agnes');

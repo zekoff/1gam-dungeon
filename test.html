@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<style>
+    p {
+        font-family: monospace;
+        font-size: small;
+    }
+</style>
+<script type="text/javascript" src="src/util/dungeon_gen_3.js"></script>
+<script>
+    /*global Dungeon*/
+    var dungeon = new Dungeon();
+    var displayMap = ["&nbsp;", ".", "+"];
+    document.write("<p>");
+    dungeon.map.forEach(function(line) {
+        line.forEach(function(cell) {
+            document.write(displayMap[cell]);
+        });
+        document.write('<br/>');
+    });
+</script>

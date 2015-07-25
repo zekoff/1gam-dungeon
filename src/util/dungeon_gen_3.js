@@ -89,7 +89,6 @@ TreeNode.prototype.createChildren = function(depth) {
     this.rightChild = new TreeNode(this, this.CHILD_RIGHT);
     this.leftChild.createChildren(depth - 1);
     this.rightChild.createChildren(depth - 1);
-    // create hallway between
 };
 TreeNode.prototype.createRoom = function() {
     var room = new Room;
@@ -130,7 +129,7 @@ TreeNode.prototype.connectRooms = function() {
             y: rightRoom.y
         };
     }
-    this.hallway.push(clonePoint(this.leftTerminus));
+    // this.hallway.push(clonePoint(this.leftTerminus));
     var nextPoint = clonePoint(this.leftTerminus);
     var distance;
     while (nextPoint.x !== this.rightTerminus.x) {
@@ -143,7 +142,7 @@ TreeNode.prototype.connectRooms = function() {
         nextPoint.y += distance / Math.abs(distance);
         this.hallway.push(clonePoint(nextPoint));
     }
-    this.hallway.push(clonePoint(this.rightTerminus));
+    // this.hallway.push(clonePoint(this.rightTerminus));
 };
 TreeNode.prototype.createMap = function() {
     var map = [];
@@ -224,6 +223,36 @@ Dungeon.prototype.prettyPrint = function() {
             line += this.map[x][y].toString();
         print(line);
     }
+};
+/*
+Get the room containing this entity, given x/y values in tiles.
+*/
+Dungeon.prototype.getContainingRoom = function(x, y) {
+    var room;
+    for (var i = 0; i < this.rooms.length; i++) {
+        room = this.rooms[i];
+        if (x >= room.x && x < room.x + room.width && y >= room.y && y < room.y + room.height)
+            return i;
+    }
+    return -1;
+};
+
+/*
+Get the room containing this entity, given x/y values in pixels.
+*/
+Dungeon.prototype.getContainingRoomPixels = function(x, y) {
+    return this.getContainingRoom(Math.floor(x / 32), Math.floor(y / 32));
+};
+
+/*
+Pick a random tile inside the given room and return its x/y location in tiles.
+*/
+Dungeon.prototype.pickRandomTileInRoom = function(roomNumber) {
+    var room = this.rooms[roomNumber];
+    return {
+        x: randomIntBetween(room.x + 1, room.x + room.width - 1),
+        y: randomIntBetween(room.y + 1, room.y + room.height - 1)
+    };
 };
 
 if (typeof module !== 'undefined')
