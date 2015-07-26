@@ -14,16 +14,12 @@ var layer;
 var cameraTween;
 
 state.create = function() {
-    // XXX delete me
-    // var d3 = new D3;
-
     var map = game.add.tilemap();
     map.addTilesetImage('test_tileset', 'test_tileset', 32, 32, 0, 0, 1);
     layer = map.create('walls', WORLD_WIDTH, WORLD_HEIGHT, 32, 32);
     layer.resizeWorld();
     var dungeon = new D3();
     game.dungeon = dungeon;
-    // dungeon.generate();
     var mapArray = dungeon.map;
     var i, j;
     for (i = 0; i < WORLD_WIDTH; i++)
@@ -62,8 +58,8 @@ state.create = function() {
     // create enemies
     game.enemies = game.add.group();
     var enemy;
-    for (i = 0; i < 5; i++) {
-        enemy = new Enemy(i);
+    for (i = 0; i < 15; i++) {
+        enemy = new Enemy(game.rnd.between(0, dungeon.rooms.length - 1));
         enemy.inputEnabled = true;
         enemy.events.onInputUp.add(function() {
             currentPlayer.setTarget(this);

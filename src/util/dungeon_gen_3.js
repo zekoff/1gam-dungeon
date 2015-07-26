@@ -1,10 +1,16 @@
 var print = print || console.log.bind(console);
 
+/*
+Constraints:
+* Dungeon height and width must be powers of 2.
+* Dungeon width must be >= dungeon height. (Well, I guess it doesn't have to be,
+but you'll get weird results otherwise.)
+*/
 var DUNGEON_WIDTH = 64;
-var DUNGEON_HEIGHT = 64;
+var DUNGEON_HEIGHT = 32;
 var SPLIT_LOCATION_MIN = 0.25;
 var SPLIT_LOCATION_MAX = 0.75;
-var RECURSION_LEVEL = 4;
+var RECURSION_LEVEL = 3;
 var ROOM_SIZE_MIN = 5;
 var ROOM_SIZE_MAX = 20;
 
@@ -105,7 +111,6 @@ TreeNode.prototype.connectRooms = function() {
     this.rightChild.connectRooms();
     var leftRoom = pickFromArray(this.leftChild.getRooms());
     var rightRoom = pickFromArray(this.rightChild.getRooms());
-    // work from left room to right room, connecting
     this.hallway = [];
     this.leftTerminus = null;
     this.rightTerminus = null;
@@ -129,7 +134,6 @@ TreeNode.prototype.connectRooms = function() {
             y: rightRoom.y
         };
     }
-    // this.hallway.push(clonePoint(this.leftTerminus));
     var nextPoint = clonePoint(this.leftTerminus);
     var distance;
     while (nextPoint.x !== this.rightTerminus.x) {
@@ -142,7 +146,6 @@ TreeNode.prototype.connectRooms = function() {
         nextPoint.y += distance / Math.abs(distance);
         this.hallway.push(clonePoint(nextPoint));
     }
-    // this.hallway.push(clonePoint(this.rightTerminus));
 };
 TreeNode.prototype.createMap = function() {
     var map = [];
@@ -184,37 +187,41 @@ TreeNode.prototype.getHallways = function(hallways) {
     this.rightChild.getHallways(hallways);
     return hallways;
 };
+TreeNode.prototype.buildWalls = function(map) {
+    var i, j;
+    for (i = 0; i < map.length; i++) {
+        map[i].unshift(0);
+        map[i].push(0);
+    }
+    map.unshift([]);
+    for (i = 0; i < DUNGEON_WIDTH + 2; i++) map[0].push(0);
+    map.push([]);
+    for (i = 0; i < DUNGEON_WIDTH + 2; i++) map[0].push(0);
+    var buildWallIfEmpty = function(x, y) {
+        try {
+            if (map[x][y] === 0) map[x][y] = 2;
+        }
+        catch (e) {}
+    };
+    for (i = 0; i < map.length; i++)
+        for (j = 0; j < map[0].length; j++)
+            if (map[i][j] === 1)
+                [i - 1, i, i + 1].forEach(function(m) {
+                    [j - 1, j, j + 1].forEach(function(n) {
+                        buildWallIfEmpty(m, n);
+                    });
+                });
+};
 
 var Dungeon = function() {
     this.tree = new TreeNode;
     this.tree.createChildren(RECURSION_LEVEL);
     this.tree.connectRooms();
     this.map = this.tree.createMap();
-    this.buildWalls();
+    this.tree.buildWalls(this.map);
     this.rooms = this.tree.getRooms();
 };
 Dungeon.prototype = {};
-Dungeon.prototype.buildWalls = function() {
-    var buildWallIfEmpty = function(x, y) {
-        try {
-            if (this.map[x][y] === 0) this.map[x][y] = 2;
-        }
-        catch (e) {}
-    };
-    for (var i = 0; i < this.map.length; i++) {
-        for (var j = 0; j < this.map[0].length; j++) {
-            if (this.map[i][j] === 1) {
-                // debugger;
-                // fill every adjacent cell that is 0 with 2
-                [i - 1, i, i + 1].forEach(function(m) {
-                    [j - 1, j, j + 1].forEach(function(n) {
-                        buildWallIfEmpty.call(this, m, n);
-                    }, this);
-                }, this);
-            }
-        }
-    }
-};
 Dungeon.prototype.prettyPrint = function() {
     var line;
     for (var y = 0; y < DUNGEON_HEIGHT; y++) {
