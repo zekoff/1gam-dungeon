@@ -16,6 +16,7 @@ var Player = function(x, y, key) {
     this.hp = 100;
     this.atk = 5;
     this.swingTimer = 0;
+    this.interactTimer = 0;
     this.runSpeed = 200;
     this.targetType = 'player';
 
@@ -28,6 +29,7 @@ Player.prototype.setTarget = function(target) {
     if (this.target && this.target.targetType === 'waypoint')
         this.target.destroy();
     if (target.targetType === 'enemy') this.swingTimer = 0;
+    if (target.targetType === 'object') this.interactTimer = 0;
     this.target = target;
 };
 
@@ -42,7 +44,7 @@ Player.prototype.update = function() {
                 this.attackEnemy('target');
                 break;
             case 'object':
-                this.interactWithObject();
+                this.interactWithObject('target');
                 break;
         }
     }
@@ -97,7 +99,15 @@ Player.prototype.attackEnemy = function(target) {
 };
 
 Player.prototype.interactWithObject = function(target) {
-
+    game.physics.arcade.moveToXY(this, this[target].x, this[target].y,
+        this.runSpeed);
+    if (game.physics.arcade.distanceBetween(this, this[target]) < 55)
+        this.interactTimer += game.time.physicsElapsed;
+    if (this.interactTimer > this[target].interactTime) {
+        this[target].finishedInteraction();
+        this[target] = null;
+        this.body.velocity.set(0);
+    }
 };
 
 module.exports = Player;

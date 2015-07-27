@@ -3,6 +3,7 @@ var state = {};
 var D3 = require('../util/dungeon_gen_3');
 var Player = require('../entity/player');
 var Enemy = require('../entity/enemy');
+var Statue = require('../entity/statue');
 var Waypoint = require('../util/waypoint');
 
 var WORLD_WIDTH = 66;
@@ -68,13 +69,12 @@ state.create = function() {
 
     // add objects
     game.objects = game.add.group();
-    var object, location;
+    var object;
     for (i = 0; i < 15; i++) {
-        location = game.dungeon.pickRandomTileInRoom(
-            game.rnd.between(0, game.dungeon.rooms.length - 1));
-        object = game.make.sprite(location.x * 32, location.y * 32, 'statue');
-        game.physics.arcade.enable(object);
-        object.body.immovable = true;
+        object = new Statue(game.rnd.between(0, dungeon.rooms.length - 1));
+        object.events.onInputUp.add(function() {
+            currentPlayer.setTarget(this);
+        }, object);
         game.objects.add(object);
     }
 
