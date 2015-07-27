@@ -1,10 +1,12 @@
 var print = print || console.log.bind(console);
 
 /*
-Constraints:
-* Dungeon height and width must be powers of 2.
-* Dungeon width must be >= dungeon height. (Well, I guess it doesn't have to be,
-but you'll get weird results otherwise.)
+Constraints to dungeon generation constants:
+* Dungeon height and width must be powers of 2, and are measured in tiles.
+* Dungeon width must be >= dungeon height. (Well, it doesn't have to be, but
+you'll get less-good results otherwise.)
+* Max room size is limited by the size of the containing block, if this value
+is set to something larger than the block can be.
 */
 var DUNGEON_WIDTH = 64;
 var DUNGEON_HEIGHT = 32;
@@ -38,16 +40,16 @@ var Room = function() {
     this.y = 0;
     this.width = 0;
     this.height = 0;
-    this.sides = {
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0
-    };
 };
 
+/*
+Tree structure used as the internal representation of the dungeon while it is
+being built. The tree root is used as the interface between the internal
+representation and the one offered by the generator's API.
+*/
 var TreeNode = function(parent, childSide) {
     if (!parent) {
+        // set defaults for root node
         this.parent = null;
         this.xOffset = 0;
         this.yOffset = 0;
@@ -56,6 +58,7 @@ var TreeNode = function(parent, childSide) {
         this.childSide = null;
     }
     else {
+        // set properties for this block based on its parent
         this.parent = parent;
         this.childSide = childSide;
         if (childSide === this.CHILD_LEFT) {
@@ -83,6 +86,10 @@ TreeNode.prototype.SPLIT_HORIZONTAL = 'horizontal';
 TreeNode.prototype.SPLIT_VERTICAL = 'vertical';
 TreeNode.prototype.CHILD_LEFT = 'left/upper';
 TreeNode.prototype.CHILD_RIGHT = 'right/lower';
+/*
+Recursively divide the dungeon space into blocks. At the lowest level, these
+blocks will contain one room each.
+*/
 TreeNode.prototype.createChildren = function(depth) {
     if (depth < 1)
         return this.createRoom();
@@ -96,6 +103,9 @@ TreeNode.prototype.createChildren = function(depth) {
     this.leftChild.createChildren(depth - 1);
     this.rightChild.createChildren(depth - 1);
 };
+/*
+Create a single room inside the block (TreeNode) upon which this method is called.
+*/
 TreeNode.prototype.createRoom = function() {
     var room = new Room;
     room.width = randomIntBetween(ROOM_SIZE_MIN, Math.min(ROOM_SIZE_MAX, this.width - 1));
@@ -105,6 +115,12 @@ TreeNode.prototype.createRoom = function() {
     this.room = room;
     return room;
 };
+/*
+Create a hallway between rooms in each sub-block of this one. Is called once
+the dungeon has been subdivided and a room has been built in each of the blocks.
+Works by setting one hallway terminus in the left room and one in the right,
+walking from one to the other recording what points are required to connect them.
+*/
 TreeNode.prototype.connectRooms = function() {
     if (this.room) return;
     this.leftChild.connectRooms();
@@ -147,6 +163,11 @@ TreeNode.prototype.connectRooms = function() {
         this.hallway.push(clonePoint(nextPoint));
     }
 };
+/*
+Using this TreeNode as the internal representation of the dungeon, create a
+two-dimensional array mapping out floor tiles in the dungeon (both hallway
+and room tiles).
+*/
 TreeNode.prototype.createMap = function() {
     var map = [];
     for (var i = 0; i < this.width; i++) {
@@ -167,6 +188,9 @@ TreeNode.prototype.createMap = function() {
     });
     return map;
 };
+/*
+Return all rooms contained by this block of the dungeon.
+*/
 TreeNode.prototype.getRooms = function() {
     if (this.room) return [this.room];
     else {
@@ -180,6 +204,9 @@ TreeNode.prototype.getRooms = function() {
         return rooms;
     }
 };
+/*
+Return all hallways contained by this block of the dungeon.
+*/
 TreeNode.prototype.getHallways = function(hallways) {
     if (!this.hallway) return;
     hallways.push(this.hallway);
@@ -187,6 +214,10 @@ TreeNode.prototype.getHallways = function(hallways) {
     this.rightChild.getHallways(hallways);
     return hallways;
 };
+/*
+Optionally called on a map of floor tiles to build walls surrounding all of
+those floor tiles.
+*/
 TreeNode.prototype.buildWalls = function(map) {
     var i, j;
     for (i = 0; i < map.length; i++) {
@@ -213,6 +244,11 @@ TreeNode.prototype.buildWalls = function(map) {
                 });
 };
 
+/*
+External interface to the procedurally generated dungeon. The `map` property
+is the two-dimensional array representing the generated dungeon, and the `rooms`
+property contains an object for each room of the dungeon.
+*/
 var Dungeon = function() {
     this.tree = new TreeNode;
     this.tree.createChildren(RECURSION_LEVEL);
@@ -222,6 +258,9 @@ var Dungeon = function() {
     this.rooms = this.tree.getRooms();
 };
 Dungeon.prototype = {};
+/*
+Print a map of the dungeon to the console.
+*/
 Dungeon.prototype.prettyPrint = function() {
     var line;
     for (var y = 0; y < DUNGEON_HEIGHT; y++) {
@@ -232,7 +271,8 @@ Dungeon.prototype.prettyPrint = function() {
     }
 };
 /*
-Get the room containing this entity, given x/y values in tiles.
+Get the room containing this entity, given x/y values in tiles. If x/y params
+are not inside a room, return -1.
 */
 Dungeon.prototype.getContainingRoom = function(x, y) {
     var room;
@@ -245,7 +285,8 @@ Dungeon.prototype.getContainingRoom = function(x, y) {
 };
 
 /*
-Get the room containing this entity, given x/y values in pixels.
+Get the room containing this entity, given x/y values in pixels. If x/y params
+are not inside a room, return -1. Assumes that tiles are 32x32 pixels.
 */
 Dungeon.prototype.getContainingRoomPixels = function(x, y) {
     return this.getContainingRoom(Math.floor(x / 32), Math.floor(y / 32));

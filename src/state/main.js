@@ -1,23 +1,22 @@
 /* global game */
 var state = {};
-var Dungeon = require('../util/dungeon_gen');
 var D3 = require('../util/dungeon_gen_3');
 var Player = require('../entity/player');
 var Enemy = require('../entity/enemy');
 var Waypoint = require('../util/waypoint');
 
-var WORLD_WIDTH = 64;
-var WORLD_HEIGHT = 64;
+var WORLD_WIDTH = 66;
+var WORLD_HEIGHT = 34;
 
 var currentPlayer;
-var layer;
+var floorLayer;
 var cameraTween;
 
 state.create = function() {
     var map = game.add.tilemap();
     map.addTilesetImage('test_tileset', 'test_tileset', 32, 32, 0, 0, 1);
-    layer = map.create('walls', WORLD_WIDTH, WORLD_HEIGHT, 32, 32);
-    layer.resizeWorld();
+    floorLayer = map.create('walls', WORLD_WIDTH, WORLD_HEIGHT, 32, 32);
+    floorLayer.resizeWorld();
     var dungeon = new D3();
     game.dungeon = dungeon;
     var mapArray = dungeon.map;
@@ -50,7 +49,7 @@ state.create = function() {
     mask.inputEnabled = true;
     mask.events.onInputUp.add(function(sprite, pointer) {
         print('Clicked in room ' + dungeon.getContainingRoom(
-            layer.getTileX(pointer.worldX), layer.getTileY(pointer.worldY)));
+            floorLayer.getTileX(pointer.worldX), floorLayer.getTileY(pointer.worldY)));
         currentPlayer.setTarget(game.add.existing(
             new Waypoint(pointer.worldX, pointer.worldY)));
     });
@@ -66,6 +65,19 @@ state.create = function() {
         }, enemy);
         game.enemies.add(enemy);
     }
+
+    // add objects
+    game.objects = game.add.group();
+    var object, location;
+    for (i = 0; i < 15; i++) {
+        location = game.dungeon.pickRandomTileInRoom(
+            game.rnd.between(0, game.dungeon.rooms.length - 1));
+        object = game.make.sprite(location.x * 32, location.y * 32, 'statue');
+        game.physics.arcade.enable(object);
+        object.body.immovable = true;
+        game.objects.add(object);
+    }
+
     game.world.bringToTop(game.players);
 
     // add HUD
@@ -106,7 +118,8 @@ state.create = function() {
 
 state.update = function() {
     // state updates first, then entities
-    game.physics.arcade.collide(game.players, layer);
+    game.physics.arcade.collide(game.players, floorLayer);
+    game.physics.arcade.collide(game.players, game.objects);
     game.physics.arcade.collide(game.players, game.enemies);
 };
 
