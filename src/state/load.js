@@ -13,6 +13,7 @@ module.exports = {
         game.load.image('frederick', 'frederick.png');
         game.load.image('orc', 'orc.png');
         game.load.image('statue', 'dngn_orcish_idol.png');
+        game.load.image('splash', 'splash.png');
         game.load.start();
     },
     update: function() {
